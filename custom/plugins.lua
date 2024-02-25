@@ -44,6 +44,7 @@ local plugins = {
       require("better_escape").setup()
     end,
   },
+  
   {
     "mfussenegger/nvim-dap",
   },
@@ -51,12 +52,13 @@ local plugins = {
   {
     "rcarriga/nvim-dap-ui",
   },
+  
   {
     "mrcjkb/rustaceanvim",
     version = "^3", -- Recommended
     ft = { "rust" },
   },
-
+  
   {
     "simrat39/inlay-hints.nvim",
     config = function()
@@ -77,6 +79,10 @@ local plugins = {
         },
       }
     end,
+  },
+
+  {
+    "yeyee2901/nvim-buf-lint"
   },
 
   -- To make a plugin not be loaded

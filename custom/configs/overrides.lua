@@ -13,14 +13,17 @@ M.mason = {
     "typescript-language-server",
     "prettier",
 
+    -- everything else
     "clangd",
     "clang-format",
     "clj-kondo",
     "clojure-lsp",
     "codelldb",
     "elixir-ls",
+    "kotlin-language-server",
     "prettier",
     "rust-analyzer",
+    "solidity",
     "tailwindcss-language-server",
   },
 }
