@@ -3,8 +3,6 @@ local overrides = require "custom.configs.overrides"
 ---@type NvPluginSpec[]
 local plugins = {
 
-  -- Override plugin definition / configuration options
-
   {
     "williamboman/mason.nvim",
     opts = overrides.mason,
@@ -24,7 +22,7 @@ local plugins = {
     config = function()
       require "plugins.configs.lspconfig"
       require "custom.configs.lspconfig"
-    end, -- Override to setup mason-lspconfig
+    end,
   },
 
   {
@@ -44,37 +42,46 @@ local plugins = {
       require("better_escape").setup()
     end,
   },
-  
-  {
-    "mfussenegger/nvim-dap",
-  },
 
   {
-    "rcarriga/nvim-dap-ui",
-  },
-  
-  {
     "mrcjkb/rustaceanvim",
-    version = "^3", -- Recommended
+    version = "^4",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "mfussenegger/nvim-dap",
+      {
+        "lvimuser/lsp-inlayhints.nvim",
+        opts = {},
+      },
+    },
     ft = { "rust" },
-  },
-  
-  {
-    "simrat39/inlay-hints.nvim",
     config = function()
-      local ih = require "inlay-hints"
-      require("rustaceanvim").setup {
+      local mason_registry = require "mason-registry"
+
+      local cfg = require "rustaceanvim.config"
+      local codelldb = mason_registry.get_package "codelldb"
+      local extension_path = codelldb:get_install_path() .. "/extension/"
+      local codelldb_path = extension_path .. "adapter/codelldb"
+      local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib"
+
+      vim.g.rustaceanvim = {
+        inlay_hints = {
+          highlight = "NonText",
+        },
+        dap = {
+          adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
+        },
         tools = {
-          on_initialized = function()
-            ih.set_all()
-          end,
-          inlay_hints = {
-            auto = false,
+          hover_actions = {
+            auto_focus = true,
           },
         },
         server = {
-          on_attach = function(c, b)
-            ih.on_attach(c, b)
+          capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          on_attach = function(client, bufnr)
+            require("lsp-inlayhints").on_attach(client, bufnr)
+            -- vim.keymap.set("n", "<Leader>k", rt.hover_actions.hover_actions, { buffer = bufnr })
+            -- vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
           end,
         },
       }
@@ -82,9 +89,42 @@ local plugins = {
   },
 
   {
-    "yeyee2901/nvim-buf-lint"
+    "mfussenegger/nvim-dap",
   },
 
+  {
+    "rcarriga/nvim-dap-ui",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+      "nvim-neotest/nvim-nio",
+    },
+    -- config = function()
+    --   require("dapui").setup()
+    -- end,
+  },
+
+  {
+    "yeyee2901/nvim-buf-lint",
+  },
+
+  {
+    "jackMort/ChatGPT.nvim",
+    event = "VeryLazy",
+    config = function()
+      local home = vim.fn.expand "$HOME"
+      require("chatgpt").setup {
+        api_key_cmd = "gpg --decrypt " .. home .. "/.openai-key.txt.gpg",
+      }
+    end,
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "nvim-lua/plenary.nvim",
+      "folke/trouble.nvim",
+      "nvim-telescope/telescope.nvim",
+    },
+  },
+  { "folke/neodev.nvim", opts = {} }
+  
   -- To make a plugin not be loaded
   -- {
   --   "NvChad/nvim-colorizer.lua",

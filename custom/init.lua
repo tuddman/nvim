@@ -5,3 +5,5 @@
 --   pattern = "*",
 --   command = "tabdo wincmd =",
 -- })
+
+vim.cmd([[hi LspInlayHint guifg=#89929b guibg=#21262d]])
